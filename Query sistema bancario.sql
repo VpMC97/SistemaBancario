@@ -1,57 +1,73 @@
-create table cliente(
-nombre varchar(100),
+create database Banco;
+
+use Banco;
+
+create table CLIENTE(
+nombre varchar(50),
 direccion varchar(100),
-correo varchar(100),
-dpi varchar(100),
-telefono varchar (100),
-nit_cliente varchar(100) PRIMARY KEY
+correo varchar(50),
+dpi varchar(20),
+telefono varchar (20),
+nit_cliente varchar(20) PRIMARY KEY
 )
 
-create table cuenta(
+create table CUENTA(
 id_cuenta int IDENTITY (1,1) PRIMARY KEY,
-tipo_de_cuenta varchar (100),
+tipo_de_cuenta varchar(50),
 saldo float,
-nit_cliente varchar(100)
-constraint fk_nit_cliente foreign key (nit_cliente) references cliente(nit_cliente)
+nit_cliente varchar(20)
+constraint fk_nit_cliente foreign key (nit_cliente) references CLIENTE(nit_cliente)
 )
 
-create table tipo_de_cuenta(
+create table CUENTA_AHORRO(
+id_cuenta int PRIMARY KEY, 
+tasa_interes float
+constraint fk_id_cuenta foreign key (id_cuenta) references CUENTA(id_cuenta)
+)
+
+create table CUENTA_CORRIENTE(
+id_cuenta int PRIMARY KEY,
+limite_descubierto float
+constraint fk_id_cuenta_ foreign key (id_cuenta) references CUENTA(id_cuenta)
+)
+  
+create table TIPO_TRANSACCION(
 id_tipo int IDENTITY (1,1) PRIMARY KEY,
-descripcion varchar (100)
+descripcion varchar (50)
 )
-
-create table detalle_transaccion(
-id_transaccion int IDENTITY (1,1) PRIMARY KEY,
-id_tipo int,
-monto float,
-constraint fk_id_tipo foreign key (id_tipo) references tipo_de_cuenta(id_tipo)
-)
-
-create table empleado(
+  
+create table EMPLEADO(
 id_empleado int IDENTITY(1,1) PRIMARY KEY,
-nombre varchar(100),
-puesto varchar(100),
-correo varchar (100),
-telefono varchar (100)
+nombre varchar(50),
+puesto varchar(50),
+correo varchar (50),
+telefono varchar (20)
 )
 
-create table sucursal(
+create table SUCURSAL(
 id_sucursal int IDENTITY (1,1) PRIMARY KEY,
-nombre varchar (100),
+nombre varchar (50),
 direccion varchar (100),
-telefono varchar (100),
-horario varchar (100)
+telefono varchar (20),
+horario varchar (50)
 )
 
-create table transaccion (
-id_transaccion int,
-fecha varchar (100),
-hora varchar (100),
+create table TRANSACCION (
+id_transaccion int IDENTITY (1,1) PRIMARY KEY,
+fecha date,
+hora time,
 id_empleado int,
 id_cuenta int,
 id_sucursal int
-constraint fk_id_transaccion foreign key (id_transaccion) references detalle_transaccion(id_transaccion),
-constraint fk_id_empleado foreign key (id_empleado) references empleado (id_empleado),
-constraint fk_id_cuenta foreign key (id_cuenta) references cuenta (id_cuenta),
-constraint fk_id_sucursal foreign key (id_sucursal) references sucursal(id_sucursal)
+constraint fk_id_empleado foreign key (id_empleado) references EMPLEADO(id_empleado),
+constraint fk_cuenta foreign key (id_cuenta) references CUENTA(id_cuenta),
+constraint fk_id_sucursal foreign key (id_sucursal) references SUCURSAL(id_sucursal)
+)
+
+create table DETALLE_TRANSACCION(
+id_transaccion int,
+id_tipo int,
+monto float,
+constraint fk_id_transaccion foreign key (id_transaccion) references TRANSACCION(id_transaccion),
+constraint fk_id_tipo foreign key (id_tipo) references TIPO_TRANSACCION(id_tipo)
 )
