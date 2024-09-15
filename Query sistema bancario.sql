@@ -1,6 +1,6 @@
-create database Banco;
+create database BancoDB;
 
-use Banco;
+use BancoDB;
 
 create table CLIENTE(
 nombre varchar(50),
@@ -11,28 +11,23 @@ telefono varchar (20),
 nit_cliente varchar(20) PRIMARY KEY
 )
 
+create table TIPO_CUENTA(
+id_tipo_cuenta int PRIMARY KEY, 
+descripcion varchar(50)
+)
+
 create table CUENTA(
 id_cuenta int IDENTITY (1,1) PRIMARY KEY,
-tipo_de_cuenta varchar(50),
+id_tipo_cuenta int,
 saldo float,
+margen float,
 nit_cliente varchar(20)
-constraint fk_nit_cliente foreign key (nit_cliente) references CLIENTE(nit_cliente)
-)
-
-create table CUENTA_AHORRO(
-id_cuenta int PRIMARY KEY, 
-tasa_interes float
-constraint fk_id_cuenta foreign key (id_cuenta) references CUENTA(id_cuenta)
-)
-
-create table CUENTA_CORRIENTE(
-id_cuenta int PRIMARY KEY,
-limite_descubierto float
-constraint fk_id_cuenta_ foreign key (id_cuenta) references CUENTA(id_cuenta)
+constraint fk_nit_cliente foreign key (nit_cliente) references CLIENTE(nit_cliente),
+constraint fk_id_tipo_cuenta foreign key (id_tipo_cuenta) references TIPO_CUENTA(id_tipo_cuenta)
 )
   
 create table TIPO_TRANSACCION(
-id_tipo int IDENTITY (1,1) PRIMARY KEY,
+id_tipo_transaccion int IDENTITY (1,1) PRIMARY KEY,
 descripcion varchar (50)
 )
   
@@ -69,5 +64,5 @@ id_transaccion int,
 id_tipo int,
 monto float,
 constraint fk_id_transaccion foreign key (id_transaccion) references TRANSACCION(id_transaccion),
-constraint fk_id_tipo foreign key (id_tipo) references TIPO_TRANSACCION(id_tipo)
+constraint fk_id_tipo foreign key (id_tipo) references TIPO_TRANSACCION(id_tipo_transaccion)
 )
