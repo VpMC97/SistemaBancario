@@ -1,6 +1,6 @@
-create database BancoDB;
+create database BancoBD;
 
-use BancoDB;
+use BancoBD;
 
 create table CLIENTE(
 nombre varchar(50),
