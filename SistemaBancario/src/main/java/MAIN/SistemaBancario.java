@@ -21,6 +21,11 @@ public class SistemaBancario {
     // LAS CLASES CONTROLADORES (TIENEN QUE CREARLAS, EJ. ClienteControlador) 
     
     private static final ClienteControlador c = new ClienteControlador();
+    private static final EmpleadoControlador e = new EmpleadoControlador();
+    private static final SucursalControlador s = new SucursalControlador();
+    private static final TipoCuentaControlador tc = new TipoCuentaControlador();
+    private static final TipoTransaccionControlador tt = new TipoTransaccionControlador();
+    private static final CuentaControlador cu = new CuentaControlador();
     
     public static void main(String[] args) {   
         do{
@@ -52,24 +57,24 @@ public class SistemaBancario {
                 case 1:
                     Submenu("CLIENTE");
                 break;
-//                case 2:
-//                    Submenu("CUENTA");
-//                break;    
-//                case 3:
-//                    Submenu("EMPLEADO");
-//                break; 
-//                case 4:
-//                    Submenu("SUCURSAL");
-//                break;     
+                case 2:
+                    Submenu("CUENTA");
+                break;    
+                case 3:
+                    Submenu("EMPLEADO");
+                break; 
+                case 4:
+                    Submenu("SUCURSAL");
+                break;     
 //                case 5:
 //                    Submenu("TRANSACCIÓN");
 //                break;  
-//                case 6:
-//                    Submenu("TIPO DE TRANSACCIÓN");
-//                break;  
-//                case 7:
-//                    Submenu("TIPO DE CUENTA");
-//                break;  
+                case 6:
+                    Submenu("TIPO DE TRANSACCIÓN");
+                break;  
+                case 7:
+                    Submenu("TIPO DE CUENTA");
+                break;  
                 case 8:
                     System.out.println("Fin del programa.");
                 break;
@@ -102,82 +107,82 @@ public class SistemaBancario {
                 case 1:
                     if (opcion == 1) 
                         c.CrearCliente();
-//                    else if (opcion == 2)
-//                        
-//                    else if (opcion == 3)
-//                            
-//                    else if (opcion == 4)
-//                            
+                    else if (opcion == 2)
+                        cu.CrearCuenta();
+                    else if (opcion == 3)
+                        e.CrearEmpleado();
+                    else if (opcion == 4)
+                        s.CrearSucursal();
 //                    else if (opcion == 5) 
 //                        
-//                    else if (opcion == 6)
-//                            
-//                    else if (opcion == 7)
-//                            
+                    else if (opcion == 6)
+                        tt.CrearTipoTransaccion();
+                    else if (opcion == 7)
+                        tc.CrearTipoCuenta();
                 break;
                 case 2:
                     if (opcion == 1)
                         c.ModificarCliente();
-//                    else if (opcion == 2)
-//                        
-//                    else if (opcion == 3)
-//                            
-//                    else if (opcion == 4)
-//                            
+                    else if (opcion == 2)
+                        cu.ModificarCuenta();
+                    else if (opcion == 3)
+                        e.ModificarEmpleado();
+                    else if (opcion == 4)
+                        s.ModificarSucursal();
 //                    else if (opcion == 5) 
 //                        
-//                    else if (opcion == 6)
-//                            
-//                    else if (opcion == 7)
-
+                    else if (opcion == 6)
+                        tt.ModificarTipoTransaccion();
+                    else if (opcion == 7)
+                        tc.ModificarTipoCuenta();
                 break;
                 case 3:
                     if (opcion == 1)
                         c.BuscarCliente();
-//                    else if (opcion == 2)
-//                        
-//                    else if (opcion == 3)
-//                            
-//                    else if (opcion == 4)
-//                            
+                    else if (opcion == 2)
+                        cu.BuscarCuenta();
+                    else if (opcion == 3)
+                        e.BuscarEmpleado();
+                    else if (opcion == 4)
+                        s.BuscarSucursal();
 //                    else if (opcion == 5) 
 //                        
-//                    else if (opcion == 6)
-//                            
-//                    else if (opcion == 7)
-//                
+                    else if (opcion == 6)
+                        tt.BuscarTipoTransaccion();
+                    else if (opcion == 7)
+                        tc.BuscarTipoCuenta();
                 break;
                 case 4:
                     if (opcion == 1)
                         c.EliminarCliente();
-//                    else if (opcion == 2)
-//                        
-//                    else if (opcion == 3)
-//                            
-//                    else if (opcion == 4)
-//                            
+                    else if (opcion == 2)
+                        cu.EliminarCuenta();
+                    else if (opcion == 3)
+                        e.EliminarEmpleado();
+                    else if (opcion == 4)
+                        s.EliminarSucursal();
 //                    else if (opcion == 5) 
 //                        
-//                    else if (opcion == 6)
-//                            
-//                    else if (opcion == 7)
-//                            
+                    else if (opcion == 6)
+                        tt.EliminarTipoTransaccion();
+                    else if (opcion == 7)
+                        tc.EliminarTipoCuenta();
                 break;
                 case 5:
                     if (opcion == 1)
                         c.ListarClientes();
-//                    else if (opcion == 2)
-//                        
-//                    else if (opcion == 3)
-//                            
-//                    else if (opcion == 4)
-//                            
+                    else if (opcion == 2)
+                        cu.ListarCuentas();
+                    else if (opcion == 3)
+                        e.ListarEmpleados();
+                    else if (opcion == 4)
+                        s.ListarSucursales();
 //                    else if (opcion == 5) 
 //                        
-//                    else if (opcion == 6)
-//                            
-//                    else if (opcion == 7)
-//                          
+                    else if (opcion == 6)
+                        tt.ListarTipoTransacciones();
+                    else if (opcion == 7)
+                        tc.ListarTipoCuenta();
                 break;
                 case 6:
                     Menu();

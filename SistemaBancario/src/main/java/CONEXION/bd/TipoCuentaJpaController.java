@@ -4,11 +4,8 @@
  */
 package CONEXION.bd;
 
-import gt.edu.umg.bd.exceptions.NonexistentEntityException;
-import gt.edu.umg.bd.exceptions.PreexistingEntityException;
 import java.io.Serializable;
 import javax.persistence.Query;
-import javax.persistence.EntityNotFoundException;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
 import java.util.ArrayList;
@@ -31,7 +28,7 @@ public class TipoCuentaJpaController implements Serializable {
         return emf.createEntityManager();
     }
 
-    public void create(TipoCuenta tipoCuenta) throws PreexistingEntityException, Exception {
+    public void Create(TipoCuenta tipoCuenta){
         if (tipoCuenta.getCuentaList() == null) {
             tipoCuenta.setCuentaList(new ArrayList<Cuenta>());
         }
@@ -56,80 +53,127 @@ public class TipoCuentaJpaController implements Serializable {
                 }
             }
             em.getTransaction().commit();
+            System.out.println("\nTipo de cuenta agregada correctamente!");
         } catch (Exception ex) {
             if (findTipoCuenta(tipoCuenta.getIdTipoCuenta()) != null) {
-                throw new PreexistingEntityException("TipoCuenta " + tipoCuenta + " already exists.", ex);
+                System.out.println("\nTipo de cuenta ya existente según ID");
+                System.out.println("No fue posible realizar esta acción, pot favor, inténtelo de nuevo");
             }
-            throw ex;
         } finally {
             if (em != null) {
                 em.close();
             }
         }
     }
-
-    public void edit(TipoCuenta tipoCuenta) throws NonexistentEntityException, Exception {
+//
+//    public void Edit(TipoCuenta tipoCuenta){
+//        EntityManager em = null;
+//        try {
+//            em = getEntityManager();
+//            em.getTransaction().begin();
+//            TipoCuenta persistentTipoCuenta = em.find(TipoCuenta.class, tipoCuenta.getIdTipoCuenta());
+//            List<Cuenta> cuentaListOld = persistentTipoCuenta.getCuentaList();
+//            List<Cuenta> cuentaListNew = tipoCuenta.getCuentaList();
+//            List<Cuenta> attachedCuentaListNew = new ArrayList<Cuenta>();
+//            for (Cuenta cuentaListNewCuentaToAttach : cuentaListNew) {
+//                cuentaListNewCuentaToAttach = em.getReference(cuentaListNewCuentaToAttach.getClass(), cuentaListNewCuentaToAttach.getIdCuenta());
+//                attachedCuentaListNew.add(cuentaListNewCuentaToAttach);
+//            }
+//            cuentaListNew = attachedCuentaListNew;
+//            tipoCuenta.setCuentaList(cuentaListNew);
+//            tipoCuenta = em.merge(tipoCuenta);
+//            for (Cuenta cuentaListOldCuenta : cuentaListOld) {
+//                if (!cuentaListNew.contains(cuentaListOldCuenta)) {
+//                    cuentaListOldCuenta.setIdTipoCuenta(null);
+//                    cuentaListOldCuenta = em.merge(cuentaListOldCuenta);
+//                }
+//            }
+//            for (Cuenta cuentaListNewCuenta : cuentaListNew) {
+//                if (!cuentaListOld.contains(cuentaListNewCuenta)) {
+//                    TipoCuenta oldIdTipoCuentaOfCuentaListNewCuenta = cuentaListNewCuenta.getIdTipoCuenta();
+//                    cuentaListNewCuenta.setIdTipoCuenta(tipoCuenta);
+//                    cuentaListNewCuenta = em.merge(cuentaListNewCuenta);
+//                    if (oldIdTipoCuentaOfCuentaListNewCuenta != null && !oldIdTipoCuentaOfCuentaListNewCuenta.equals(tipoCuenta)) {
+//                        oldIdTipoCuentaOfCuentaListNewCuenta.getCuentaList().remove(cuentaListNewCuenta);
+//                        oldIdTipoCuentaOfCuentaListNewCuenta = em.merge(oldIdTipoCuentaOfCuentaListNewCuenta);
+//                    }
+//                }
+//            }
+//            em.getTransaction().commit();
+//            System.out.println("Tipo de cuenta modificada correctamente");
+//        } catch (Exception ex) {
+//            String msg = ex.getLocalizedMessage();
+//            if (msg == null || msg.length() == 0) {
+//                Integer id = tipoCuenta.getIdTipoCuenta();
+//                if (findTipoCuenta(id) == null) {
+//                    System.out.println("\nTipo de cuenta con ID " + id + "no existente");
+//                    System.out.println("No fue posible realizar esta acción, pot favor, inténtelo de nuevo");
+//                }
+//            }
+//        } finally {
+//            if (em != null) {
+//                em.close();
+//            }
+//        }
+//    }
+//    
+    public void Update(TipoCuenta tipoCuenta){
         EntityManager em = null;
-        try {
+        
+        try{
             em = getEntityManager();
             em.getTransaction().begin();
             TipoCuenta persistentTipoCuenta = em.find(TipoCuenta.class, tipoCuenta.getIdTipoCuenta());
-            List<Cuenta> cuentaListOld = persistentTipoCuenta.getCuentaList();
-            List<Cuenta> cuentaListNew = tipoCuenta.getCuentaList();
-            List<Cuenta> attachedCuentaListNew = new ArrayList<Cuenta>();
-            for (Cuenta cuentaListNewCuentaToAttach : cuentaListNew) {
-                cuentaListNewCuentaToAttach = em.getReference(cuentaListNewCuentaToAttach.getClass(), cuentaListNewCuentaToAttach.getIdCuenta());
-                attachedCuentaListNew.add(cuentaListNewCuentaToAttach);
-            }
-            cuentaListNew = attachedCuentaListNew;
-            tipoCuenta.setCuentaList(cuentaListNew);
-            tipoCuenta = em.merge(tipoCuenta);
-            for (Cuenta cuentaListOldCuenta : cuentaListOld) {
-                if (!cuentaListNew.contains(cuentaListOldCuenta)) {
-                    cuentaListOldCuenta.setIdTipoCuenta(null);
-                    cuentaListOldCuenta = em.merge(cuentaListOldCuenta);
-                }
-            }
-            for (Cuenta cuentaListNewCuenta : cuentaListNew) {
-                if (!cuentaListOld.contains(cuentaListNewCuenta)) {
-                    TipoCuenta oldIdTipoCuentaOfCuentaListNewCuenta = cuentaListNewCuenta.getIdTipoCuenta();
-                    cuentaListNewCuenta.setIdTipoCuenta(tipoCuenta);
-                    cuentaListNewCuenta = em.merge(cuentaListNewCuenta);
-                    if (oldIdTipoCuentaOfCuentaListNewCuenta != null && !oldIdTipoCuentaOfCuentaListNewCuenta.equals(tipoCuenta)) {
-                        oldIdTipoCuentaOfCuentaListNewCuenta.getCuentaList().remove(cuentaListNewCuenta);
-                        oldIdTipoCuentaOfCuentaListNewCuenta = em.merge(oldIdTipoCuentaOfCuentaListNewCuenta);
-                    }
-                }
+
+            if (em.contains(persistentTipoCuenta)){
+                em.merge(tipoCuenta);
+                System.out.println("\nTipo de cuenta modificada correctamente!");
             }
             em.getTransaction().commit();
-        } catch (Exception ex) {
-            String msg = ex.getLocalizedMessage();
-            if (msg == null || msg.length() == 0) {
-                Integer id = tipoCuenta.getIdTipoCuenta();
-                if (findTipoCuenta(id) == null) {
-                    throw new NonexistentEntityException("The tipoCuenta with id " + id + " no longer exists.");
-                }
+        }catch(Exception e){
+            if (findTipoCuenta(tipoCuenta.getIdTipoCuenta()) == null ){
+                System.out.println("\nTipo de cuenta con ID " + tipoCuenta.getIdTipoCuenta() + " no existente");
+                System.out.println("No fue posible realizar esta acción, pot favor, inténtelo de nuevo");
             }
-            throw ex;
-        } finally {
-            if (em != null) {
+        }finally{
+            if (em != null)
                 em.close();
-            }
-        }
+        }    
     }
+    
+    public TipoCuenta ObjetoTipoC(Integer id){
+        EntityManager em = null;
+        
+        try{
+            em = getEntityManager();
+            em.getTransaction().begin();
+            TipoCuenta tipoCuenta = em.find(TipoCuenta.class, id);
+            
+            if (em.contains(tipoCuenta)){
+                return tipoCuenta;
+            }
+            em.getTransaction().commit();
+        }catch(Exception e){
+            if (findTipoCuenta(id) == null ){
+                System.out.println("\nTipo de cuenta con ID " + id + " no existente");
+                System.out.println("No fue posible realizar esta acción, pot favor, inténtelo de nuevo");
+            }
+        }finally{
+            if (em != null)
+                em.close();
+        }    
+        return null;
+    }
+    
 
-    public void destroy(Integer id) throws NonexistentEntityException {
+    public void Destroy(Integer id){
         EntityManager em = null;
         try {
             em = getEntityManager();
             em.getTransaction().begin();
-            TipoCuenta tipoCuenta;
-            try {
-                tipoCuenta = em.getReference(TipoCuenta.class, id);
-                tipoCuenta.getIdTipoCuenta();
-            } catch (EntityNotFoundException enfe) {
-                throw new NonexistentEntityException("The tipoCuenta with id " + id + " no longer exists.", enfe);
-            }
+            TipoCuenta tipoCuenta = em.getReference(TipoCuenta.class, id);
+            tipoCuenta.getIdTipoCuenta();
+            
             List<Cuenta> cuentaList = tipoCuenta.getCuentaList();
             for (Cuenta cuentaListCuenta : cuentaList) {
                 cuentaListCuenta.setIdTipoCuenta(null);
@@ -137,6 +181,10 @@ public class TipoCuentaJpaController implements Serializable {
             }
             em.remove(tipoCuenta);
             em.getTransaction().commit();
+            System.out.println("\nTipo de cuenta eliminado correctamente");
+        } catch (Exception e) {
+            System.out.println("\nTipo de cuenta con ID " + id + " no existente");
+            System.out.println("No fue posible realizar esta acción, pot favor, inténtelo de nuevo");
         } finally {
             if (em != null) {
                 em.close();

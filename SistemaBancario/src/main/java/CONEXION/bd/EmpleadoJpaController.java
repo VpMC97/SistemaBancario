@@ -4,10 +4,8 @@
  */
 package CONEXION.bd;
 
-import gt.edu.umg.bd.exceptions.NonexistentEntityException;
 import java.io.Serializable;
 import javax.persistence.Query;
-import javax.persistence.EntityNotFoundException;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
 import java.util.ArrayList;
@@ -30,7 +28,7 @@ public class EmpleadoJpaController implements Serializable {
         return emf.createEntityManager();
     }
 
-    public void create(Empleado empleado) {
+    public void Create(Empleado empleado) {
         if (empleado.getTransaccionList() == null) {
             empleado.setTransaccionList(new ArrayList<Transaccion>());
         }
@@ -55,6 +53,7 @@ public class EmpleadoJpaController implements Serializable {
                 }
             }
             em.getTransaction().commit();
+            System.out.println("\nEmpleado agregado correctamente!");
         } finally {
             if (em != null) {
                 em.close();
@@ -62,68 +61,89 @@ public class EmpleadoJpaController implements Serializable {
         }
     }
 
-    public void edit(Empleado empleado) throws NonexistentEntityException, Exception {
+//    public void Edit(Empleado empleado) throws NonexistentEntityException, Exception {
+//        EntityManager em = null;
+//        try {
+//            em = getEntityManager();
+//            em.getTransaction().begin();
+//            Empleado persistentEmpleado = em.find(Empleado.class, empleado.getIdEmpleado());
+//            List<Transaccion> transaccionListOld = persistentEmpleado.getTransaccionList();
+//            List<Transaccion> transaccionListNew = empleado.getTransaccionList();
+//            List<Transaccion> attachedTransaccionListNew = new ArrayList<Transaccion>();
+//            for (Transaccion transaccionListNewTransaccionToAttach : transaccionListNew) {
+//                transaccionListNewTransaccionToAttach = em.getReference(transaccionListNewTransaccionToAttach.getClass(), transaccionListNewTransaccionToAttach.getIdTransaccion());
+//                attachedTransaccionListNew.add(transaccionListNewTransaccionToAttach);
+//            }
+//            transaccionListNew = attachedTransaccionListNew;
+//            empleado.setTransaccionList(transaccionListNew);
+//            empleado = em.merge(empleado);
+//            for (Transaccion transaccionListOldTransaccion : transaccionListOld) {
+//                if (!transaccionListNew.contains(transaccionListOldTransaccion)) {
+//                    transaccionListOldTransaccion.setIdEmpleado(null);
+//                    transaccionListOldTransaccion = em.merge(transaccionListOldTransaccion);
+//                }
+//            }
+//            for (Transaccion transaccionListNewTransaccion : transaccionListNew) {
+//                if (!transaccionListOld.contains(transaccionListNewTransaccion)) {
+//                    Empleado oldIdEmpleadoOfTransaccionListNewTransaccion = transaccionListNewTransaccion.getIdEmpleado();
+//                    transaccionListNewTransaccion.setIdEmpleado(empleado);
+//                    transaccionListNewTransaccion = em.merge(transaccionListNewTransaccion);
+//                    if (oldIdEmpleadoOfTransaccionListNewTransaccion != null && !oldIdEmpleadoOfTransaccionListNewTransaccion.equals(empleado)) {
+//                        oldIdEmpleadoOfTransaccionListNewTransaccion.getTransaccionList().remove(transaccionListNewTransaccion);
+//                        oldIdEmpleadoOfTransaccionListNewTransaccion = em.merge(oldIdEmpleadoOfTransaccionListNewTransaccion);
+//                    }
+//                }
+//            }
+//            em.getTransaction().commit();
+//        } catch (Exception ex) {
+//            String msg = ex.getLocalizedMessage();
+//            if (msg == null || msg.length() == 0) {
+//                Integer id = empleado.getIdEmpleado();
+//                if (findEmpleado(id) == null) {
+//                    throw new NonexistentEntityException("The empleado with id " + id + " no longer exists.");
+//                }
+//            }
+//            throw ex;
+//        } finally {
+//            if (em != null) {
+//                em.close();
+//            }
+//        }
+//    }
+    
+    public void Update(Empleado empleado){
         EntityManager em = null;
-        try {
+        
+        try{
             em = getEntityManager();
             em.getTransaction().begin();
-            Empleado persistentEmpleado = em.find(Empleado.class, empleado.getIdEmpleado());
-            List<Transaccion> transaccionListOld = persistentEmpleado.getTransaccionList();
-            List<Transaccion> transaccionListNew = empleado.getTransaccionList();
-            List<Transaccion> attachedTransaccionListNew = new ArrayList<Transaccion>();
-            for (Transaccion transaccionListNewTransaccionToAttach : transaccionListNew) {
-                transaccionListNewTransaccionToAttach = em.getReference(transaccionListNewTransaccionToAttach.getClass(), transaccionListNewTransaccionToAttach.getIdTransaccion());
-                attachedTransaccionListNew.add(transaccionListNewTransaccionToAttach);
-            }
-            transaccionListNew = attachedTransaccionListNew;
-            empleado.setTransaccionList(transaccionListNew);
-            empleado = em.merge(empleado);
-            for (Transaccion transaccionListOldTransaccion : transaccionListOld) {
-                if (!transaccionListNew.contains(transaccionListOldTransaccion)) {
-                    transaccionListOldTransaccion.setIdEmpleado(null);
-                    transaccionListOldTransaccion = em.merge(transaccionListOldTransaccion);
-                }
-            }
-            for (Transaccion transaccionListNewTransaccion : transaccionListNew) {
-                if (!transaccionListOld.contains(transaccionListNewTransaccion)) {
-                    Empleado oldIdEmpleadoOfTransaccionListNewTransaccion = transaccionListNewTransaccion.getIdEmpleado();
-                    transaccionListNewTransaccion.setIdEmpleado(empleado);
-                    transaccionListNewTransaccion = em.merge(transaccionListNewTransaccion);
-                    if (oldIdEmpleadoOfTransaccionListNewTransaccion != null && !oldIdEmpleadoOfTransaccionListNewTransaccion.equals(empleado)) {
-                        oldIdEmpleadoOfTransaccionListNewTransaccion.getTransaccionList().remove(transaccionListNewTransaccion);
-                        oldIdEmpleadoOfTransaccionListNewTransaccion = em.merge(oldIdEmpleadoOfTransaccionListNewTransaccion);
-                    }
-                }
+            Empleado persistentEmpelado = em.find(Empleado.class, empleado.getIdEmpleado());
+
+            if (em.contains(persistentEmpelado)){
+                em.merge(empleado);
+                System.out.println("\nEmpleado modificado correctamente!");
             }
             em.getTransaction().commit();
-        } catch (Exception ex) {
-            String msg = ex.getLocalizedMessage();
-            if (msg == null || msg.length() == 0) {
-                Integer id = empleado.getIdEmpleado();
-                if (findEmpleado(id) == null) {
-                    throw new NonexistentEntityException("The empleado with id " + id + " no longer exists.");
-                }
+        }catch(Exception e){
+            if (findEmpleado(empleado.getIdEmpleado()) == null ){
+                System.out.println("\nEmpleado con ID " + empleado.getIdEmpleado() + " no existente");
+                System.out.println("No fue posible realizar esta acción, pot favor, inténtelo de nuevo");
             }
-            throw ex;
-        } finally {
-            if (em != null) {
+        }finally{
+            if (em != null)
                 em.close();
-            }
-        }
+        }    
     }
+    
 
-    public void destroy(Integer id) throws NonexistentEntityException {
+    public void Destroy(Integer id){
         EntityManager em = null;
         try {
             em = getEntityManager();
             em.getTransaction().begin();
-            Empleado empleado;
-            try {
-                empleado = em.getReference(Empleado.class, id);
-                empleado.getIdEmpleado();
-            } catch (EntityNotFoundException enfe) {
-                throw new NonexistentEntityException("The empleado with id " + id + " no longer exists.", enfe);
-            }
+            Empleado empleado = em.getReference(Empleado.class, id);
+            empleado.getIdEmpleado();
+            
             List<Transaccion> transaccionList = empleado.getTransaccionList();
             for (Transaccion transaccionListTransaccion : transaccionList) {
                 transaccionListTransaccion.setIdEmpleado(null);
@@ -131,6 +151,10 @@ public class EmpleadoJpaController implements Serializable {
             }
             em.remove(empleado);
             em.getTransaction().commit();
+            System.out.println("\nEmpleado eliminado correctamente");
+        } catch (Exception e) {
+            System.out.println("\nEmpleado con ID " + id + " no existente");
+            System.out.println("No fue posible realizar esta acción, pot favor, inténtelo de nuevo");
         } finally {
             if (em != null) {
                 em.close();

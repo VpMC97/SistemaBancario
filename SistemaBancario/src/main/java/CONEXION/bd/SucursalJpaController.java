@@ -4,10 +4,9 @@
  */
 package CONEXION.bd;
 
-import gt.edu.umg.bd.exceptions.NonexistentEntityException;
+
 import java.io.Serializable;
 import javax.persistence.Query;
-import javax.persistence.EntityNotFoundException;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
 import java.util.ArrayList;
@@ -30,7 +29,7 @@ public class SucursalJpaController implements Serializable {
         return emf.createEntityManager();
     }
 
-    public void create(Sucursal sucursal) {
+    public void Create(Sucursal sucursal) {
         if (sucursal.getTransaccionList() == null) {
             sucursal.setTransaccionList(new ArrayList<Transaccion>());
         }
@@ -55,6 +54,12 @@ public class SucursalJpaController implements Serializable {
                 }
             }
             em.getTransaction().commit();
+            System.out.println("\nSucursal agregada correctamente!");
+        } catch (Exception ex) {
+            if (findSucursal(sucursal.getIdSucursal()) != null) {
+                System.out.println("\nSucursal ya existente según ID");
+                System.out.println("No fue posible realizar esta acción, pot favor, inténtelo de nuevo");
+            }
         } finally {
             if (em != null) {
                 em.close();
@@ -62,68 +67,88 @@ public class SucursalJpaController implements Serializable {
         }
     }
 
-    public void edit(Sucursal sucursal) throws NonexistentEntityException, Exception {
+//    public void Edit(Sucursal sucursal) throws NonexistentEntityException, Exception {
+//        EntityManager em = null;
+//        try {
+//            em = getEntityManager();
+//            em.getTransaction().begin();
+//            Sucursal persistentSucursal = em.find(Sucursal.class, sucursal.getIdSucursal());
+//            List<Transaccion> transaccionListOld = persistentSucursal.getTransaccionList();
+//            List<Transaccion> transaccionListNew = sucursal.getTransaccionList();
+//            List<Transaccion> attachedTransaccionListNew = new ArrayList<Transaccion>();
+//            for (Transaccion transaccionListNewTransaccionToAttach : transaccionListNew) {
+//                transaccionListNewTransaccionToAttach = em.getReference(transaccionListNewTransaccionToAttach.getClass(), transaccionListNewTransaccionToAttach.getIdTransaccion());
+//                attachedTransaccionListNew.add(transaccionListNewTransaccionToAttach);
+//            }
+//            transaccionListNew = attachedTransaccionListNew;
+//            sucursal.setTransaccionList(transaccionListNew);
+//            sucursal = em.merge(sucursal);
+//            for (Transaccion transaccionListOldTransaccion : transaccionListOld) {
+//                if (!transaccionListNew.contains(transaccionListOldTransaccion)) {
+//                    transaccionListOldTransaccion.setIdSucursal(null);
+//                    transaccionListOldTransaccion = em.merge(transaccionListOldTransaccion);
+//                }
+//            }
+//            for (Transaccion transaccionListNewTransaccion : transaccionListNew) {
+//                if (!transaccionListOld.contains(transaccionListNewTransaccion)) {
+//                    Sucursal oldIdSucursalOfTransaccionListNewTransaccion = transaccionListNewTransaccion.getIdSucursal();
+//                    transaccionListNewTransaccion.setIdSucursal(sucursal);
+//                    transaccionListNewTransaccion = em.merge(transaccionListNewTransaccion);
+//                    if (oldIdSucursalOfTransaccionListNewTransaccion != null && !oldIdSucursalOfTransaccionListNewTransaccion.equals(sucursal)) {
+//                        oldIdSucursalOfTransaccionListNewTransaccion.getTransaccionList().remove(transaccionListNewTransaccion);
+//                        oldIdSucursalOfTransaccionListNewTransaccion = em.merge(oldIdSucursalOfTransaccionListNewTransaccion);
+//                    }
+//                }
+//            }
+//            em.getTransaction().commit();
+//        } catch (Exception ex) {
+//            String msg = ex.getLocalizedMessage();
+//            if (msg == null || msg.length() == 0) {
+//                Integer id = sucursal.getIdSucursal();
+//                if (findSucursal(id) == null) {
+//                    throw new NonexistentEntityException("The sucursal with id " + id + " no longer exists.");
+//                }
+//            }
+//            throw ex;
+//        } finally {
+//            if (em != null) {
+//                em.close();
+//            }
+//        }
+//    }
+//    
+    public void Update(Sucursal sucursal){
         EntityManager em = null;
-        try {
+        
+        try{
             em = getEntityManager();
             em.getTransaction().begin();
             Sucursal persistentSucursal = em.find(Sucursal.class, sucursal.getIdSucursal());
-            List<Transaccion> transaccionListOld = persistentSucursal.getTransaccionList();
-            List<Transaccion> transaccionListNew = sucursal.getTransaccionList();
-            List<Transaccion> attachedTransaccionListNew = new ArrayList<Transaccion>();
-            for (Transaccion transaccionListNewTransaccionToAttach : transaccionListNew) {
-                transaccionListNewTransaccionToAttach = em.getReference(transaccionListNewTransaccionToAttach.getClass(), transaccionListNewTransaccionToAttach.getIdTransaccion());
-                attachedTransaccionListNew.add(transaccionListNewTransaccionToAttach);
-            }
-            transaccionListNew = attachedTransaccionListNew;
-            sucursal.setTransaccionList(transaccionListNew);
-            sucursal = em.merge(sucursal);
-            for (Transaccion transaccionListOldTransaccion : transaccionListOld) {
-                if (!transaccionListNew.contains(transaccionListOldTransaccion)) {
-                    transaccionListOldTransaccion.setIdSucursal(null);
-                    transaccionListOldTransaccion = em.merge(transaccionListOldTransaccion);
-                }
-            }
-            for (Transaccion transaccionListNewTransaccion : transaccionListNew) {
-                if (!transaccionListOld.contains(transaccionListNewTransaccion)) {
-                    Sucursal oldIdSucursalOfTransaccionListNewTransaccion = transaccionListNewTransaccion.getIdSucursal();
-                    transaccionListNewTransaccion.setIdSucursal(sucursal);
-                    transaccionListNewTransaccion = em.merge(transaccionListNewTransaccion);
-                    if (oldIdSucursalOfTransaccionListNewTransaccion != null && !oldIdSucursalOfTransaccionListNewTransaccion.equals(sucursal)) {
-                        oldIdSucursalOfTransaccionListNewTransaccion.getTransaccionList().remove(transaccionListNewTransaccion);
-                        oldIdSucursalOfTransaccionListNewTransaccion = em.merge(oldIdSucursalOfTransaccionListNewTransaccion);
-                    }
-                }
+
+            if (em.contains(persistentSucursal)){
+                em.merge(sucursal);
+                System.out.println("\nSucursal modificada correctamente!");
             }
             em.getTransaction().commit();
-        } catch (Exception ex) {
-            String msg = ex.getLocalizedMessage();
-            if (msg == null || msg.length() == 0) {
-                Integer id = sucursal.getIdSucursal();
-                if (findSucursal(id) == null) {
-                    throw new NonexistentEntityException("The sucursal with id " + id + " no longer exists.");
-                }
+        }catch(Exception e){
+            if (findSucursal(sucursal.getIdSucursal()) == null ){
+                System.out.println("\nSucursal con ID " + sucursal.getIdSucursal() + " no existente");
+                System.out.println("No fue posible realizar esta acción, pot favor, inténtelo de nuevo");
             }
-            throw ex;
-        } finally {
-            if (em != null) {
+        }finally{
+            if (em != null)
                 em.close();
-            }
-        }
+        }    
     }
 
-    public void destroy(Integer id) throws NonexistentEntityException {
+    public void Destroy(Integer id){
         EntityManager em = null;
         try {
             em = getEntityManager();
             em.getTransaction().begin();
-            Sucursal sucursal;
-            try {
-                sucursal = em.getReference(Sucursal.class, id);
-                sucursal.getIdSucursal();
-            } catch (EntityNotFoundException enfe) {
-                throw new NonexistentEntityException("The sucursal with id " + id + " no longer exists.", enfe);
-            }
+            Sucursal sucursal = em.getReference(Sucursal.class, id);
+            sucursal.getIdSucursal();
+
             List<Transaccion> transaccionList = sucursal.getTransaccionList();
             for (Transaccion transaccionListTransaccion : transaccionList) {
                 transaccionListTransaccion.setIdSucursal(null);
@@ -131,6 +156,10 @@ public class SucursalJpaController implements Serializable {
             }
             em.remove(sucursal);
             em.getTransaction().commit();
+            System.out.println("\nSucursal eliminada correctamente");
+        } catch (Exception e) {
+            System.out.println("\nSucursal con ID " + id + " no existente");
+            System.out.println("No fue posible realizar esta acción, pot favor, inténtelo de nuevo");
         } finally {
             if (em != null) {
                 em.close();
@@ -183,5 +212,6 @@ public class SucursalJpaController implements Serializable {
             em.close();
         }
     }
+    
     
 }

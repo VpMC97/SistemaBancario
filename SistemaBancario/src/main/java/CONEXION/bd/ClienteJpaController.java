@@ -4,11 +4,8 @@
  */
 package CONEXION.bd;
 
-import gt.edu.umg.bd.exceptions.NonexistentEntityException;
-import gt.edu.umg.bd.exceptions.PreexistingEntityException;
 import java.io.Serializable;
 import javax.persistence.Query;
-import javax.persistence.EntityNotFoundException;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
 import java.util.ArrayList;
@@ -35,7 +32,7 @@ public class ClienteJpaController implements Serializable {
         return emf.createEntityManager();
     }
 
-    public void Create(Cliente cliente) throws PreexistingEntityException, Exception {
+    public void Create(Cliente cliente){
         if (cliente.getCuentaList() == null) {
             cliente.setCuentaList(new ArrayList<Cuenta>());
         }
@@ -60,11 +57,12 @@ public class ClienteJpaController implements Serializable {
                 }
             }
             em.getTransaction().commit();
+            System.out.println("\nCliente agregado correctamente!");
         } catch (Exception ex) {
             if (findCliente(cliente.getNitCliente()) != null) {
-                throw new PreexistingEntityException("Cliente " + cliente + " existente según NIT", ex);
+                System.out.println("\nCliente ya existente según NIT");
+                System.out.println("No fue posible realizar esta acción, pot favor, inténtelo de nuevo");
             }
-            throw ex;
         } finally {
             if (em != null) {
                 em.close();
@@ -122,7 +120,7 @@ public class ClienteJpaController implements Serializable {
 //        }
 //    }
 //    
-    public void Update(Cliente cliente) throws NonexistentEntityException {
+    public void Update(Cliente cliente){
         EntityManager em = null;
         
         try{
@@ -132,31 +130,53 @@ public class ClienteJpaController implements Serializable {
 
             if (em.contains(persistentCliente)){
                 em.merge(cliente);
-                System.out.println("Cliente modificado correctamente!");
+                System.out.println("\nCliente modificado correctamente!");
             }
             em.getTransaction().commit();
         }catch(Exception e){
-            if (findCliente(cliente.getNitCliente()) == null )
-                throw new NonexistentEntityException("Cliente no existente según NIT");
-            throw e;
+            if (findCliente(cliente.getNitCliente()) == null ){
+                System.out.println("\nCliente con ID " + cliente.getNitCliente() + " no existente");
+                System.out.println("No fue posible realizar esta acción, pot favor, inténtelo de nuevo");
+            }
         }finally{
             if (em != null)
                 em.close();
         }    
     }
     
-    public void destroy(String id) throws NonexistentEntityException {
+    public Cliente ObjetoTipoC(String nit){
+        EntityManager em = null;
+        
+        try{
+            em = getEntityManager();
+            em.getTransaction().begin();
+            Cliente cliente = em.find(Cliente.class, nit);
+            
+            if (em.contains(cliente)){
+                return cliente;
+            }
+            em.getTransaction().commit();
+        }catch(Exception e){
+            if (findCliente(nit) == null ){
+                System.out.println("\nCliente con NIT " + nit + " no existente");
+                System.out.println("No fue posible realizar esta acción, pot favor, inténtelo de nuevo");
+            }
+        }finally{
+            if (em != null)
+                em.close();
+        }    
+        return null;
+    }    
+    
+    public void Destroy(String id){
         EntityManager em = null;
         try {
             em = getEntityManager();
             em.getTransaction().begin();
-            Cliente cliente;
-            try {
-                cliente = em.getReference(Cliente.class, id);
-                cliente.getNitCliente();
-            } catch (EntityNotFoundException enfe) {
-                throw new NonexistentEntityException("The cliente with id " + id + " no longer exists.", enfe);
-            }
+            
+            Cliente cliente = em.getReference(Cliente.class, id);
+            cliente.getNitCliente();
+            
             List<Cuenta> cuentaList = cliente.getCuentaList();
             for (Cuenta cuentaListCuenta : cuentaList) {
                 cuentaListCuenta.setNitCliente(null);
@@ -164,7 +184,10 @@ public class ClienteJpaController implements Serializable {
             }
             em.remove(cliente);
             em.getTransaction().commit();
-            System.out.println("Cliente eliminado corresctamente");
+            System.out.println("\nCliente eliminado correctamente");
+        } catch (Exception e) {
+            System.out.println("\nCliente con NIT " + id + " no existente");
+            System.out.println("No fue posible realizar esta acción, pot favor, inténtelo de nuevo");
         } finally {
             if (em != null) {
                 em.close();

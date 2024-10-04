@@ -5,12 +5,9 @@
 package CONTROLADOR;
 
 import CONEXION.bd.*;
-import gt.edu.umg.bd.exceptions.NonexistentEntityException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 
@@ -53,13 +50,8 @@ public class ClienteControlador {
         String telefono = sc.nextLine();
         cliente.setTelefono(telefono);
         
-        try {
-            ClienteJPA.Create(cliente);
-        } catch (Exception ex) {
-            Logger.getLogger(ClienteControlador.class.getName()).log(Level.SEVERE, null, ex);
-        } finally {
-            Continuar();
-        }
+        ClienteJPA.Create(cliente);
+        Continuar();
     }
     
     public void ModificarCliente(){
@@ -87,13 +79,8 @@ public class ClienteControlador {
         String telefono = sc.nextLine();
         cliente.setTelefono(telefono);
         
-        try {
-            ClienteJPA.Update(cliente);
-        } catch (NonexistentEntityException ex) {
-            Logger.getLogger(ClienteControlador.class.getName()).log(Level.SEVERE, null, ex);
-        } finally {
-            Continuar();
-        }
+        ClienteJPA.Update(cliente);
+        Continuar();
     }
     
     public void BuscarCliente(){
@@ -103,22 +90,24 @@ public class ClienteControlador {
         String nit = sc.nextLine();
         
         List <Cliente> clientes = new ArrayList<>();
-
+        boolean bandera = false;
         clientes = ClienteJPA.findClienteEntities();
         
         for (Cliente c : clientes){
             if (c.getNitCliente().equals(nit)){
+                bandera = true;
                 System.out.println("NIT: " + c.getNitCliente());
                 System.out.println("Nombre: " + c.getNombre());
                 System.out.println("Dirección: " + c.getDireccion());
                 System.out.println("Correo: " + c.getCorreo());
                 System.out.println("DPI: " + c.getDpi());
                 System.out.println("Teléfono: " + c.getTelefono());
-            }
-            else{
-                System.out.println("Cliente no existente según NIT");
+                break;
             }
         }
+        if (bandera!=true)
+            System.out.println("Cliente no existente según NIT");
+        
         Continuar();
     }
     
@@ -129,13 +118,8 @@ public class ClienteControlador {
         System.out.println("Ingrese NIT del cliente a ELIMINAR: ");
         String nit = sc.nextLine();
         
-        try {
-            ClienteJPA.destroy(nit);
-        } catch (NonexistentEntityException ex) {
-            Logger.getLogger(ClienteControlador.class.getName()).log(Level.SEVERE, null, ex);
-        } finally {
-            Continuar();
-        }
+        ClienteJPA.Destroy(nit);
+        Continuar();
     }
     
     public void ListarClientes(){
@@ -157,7 +141,7 @@ public class ClienteControlador {
     } 
     
     public void Continuar(){
-        System.out.println("Presione enter para continuar ....");
+        System.out.println("\nPresione enter para continuar ....\n");
         sc.nextLine();
     }
 }

@@ -30,7 +30,7 @@ public class CuentaJpaController implements Serializable {
         return emf.createEntityManager();
     }
 
-    public void create(Cuenta cuenta) {
+    public void Create(Cuenta cuenta) {
         if (cuenta.getTransaccionList() == null) {
             cuenta.setTransaccionList(new ArrayList<Transaccion>());
         }
@@ -73,6 +73,7 @@ public class CuentaJpaController implements Serializable {
                 }
             }
             em.getTransaction().commit();
+            System.out.println("\nCuenta creada correctamente!");
         } finally {
             if (em != null) {
                 em.close();
@@ -80,7 +81,7 @@ public class CuentaJpaController implements Serializable {
         }
     }
 
-    public void edit(Cuenta cuenta) throws NonexistentEntityException, Exception {
+    public void Edit(Cuenta cuenta){
         EntityManager em = null;
         try {
             em = getEntityManager();
@@ -100,13 +101,13 @@ public class CuentaJpaController implements Serializable {
                 idTipoCuentaNew = em.getReference(idTipoCuentaNew.getClass(), idTipoCuentaNew.getIdTipoCuenta());
                 cuenta.setIdTipoCuenta(idTipoCuentaNew);
             }
-            List<Transaccion> attachedTransaccionListNew = new ArrayList<Transaccion>();
-            for (Transaccion transaccionListNewTransaccionToAttach : transaccionListNew) {
-                transaccionListNewTransaccionToAttach = em.getReference(transaccionListNewTransaccionToAttach.getClass(), transaccionListNewTransaccionToAttach.getIdTransaccion());
-                attachedTransaccionListNew.add(transaccionListNewTransaccionToAttach);
-            }
-            transaccionListNew = attachedTransaccionListNew;
-            cuenta.setTransaccionList(transaccionListNew);
+//            List<Transaccion> attachedTransaccionListNew = new ArrayList<Transaccion>();
+//            for (Transaccion transaccionListNewTransaccionToAttach : transaccionListNew) {
+//                transaccionListNewTransaccionToAttach = em.getReference(transaccionListNewTransaccionToAttach.getClass(), transaccionListNewTransaccionToAttach.getIdTransaccion());
+//                attachedTransaccionListNew.add(transaccionListNewTransaccionToAttach);
+//            }
+//            transaccionListNew = attachedTransaccionListNew;
+//            cuenta.setTransaccionList(transaccionListNew);
             cuenta = em.merge(cuenta);
             if (nitClienteOld != null && !nitClienteOld.equals(nitClienteNew)) {
                 nitClienteOld.getCuentaList().remove(cuenta);
@@ -130,46 +131,68 @@ public class CuentaJpaController implements Serializable {
                     transaccionListOldTransaccion = em.merge(transaccionListOldTransaccion);
                 }
             }
-            for (Transaccion transaccionListNewTransaccion : transaccionListNew) {
-                if (!transaccionListOld.contains(transaccionListNewTransaccion)) {
-                    Cuenta oldIdCuentaOfTransaccionListNewTransaccion = transaccionListNewTransaccion.getIdCuenta();
-                    transaccionListNewTransaccion.setIdCuenta(cuenta);
-                    transaccionListNewTransaccion = em.merge(transaccionListNewTransaccion);
-                    if (oldIdCuentaOfTransaccionListNewTransaccion != null && !oldIdCuentaOfTransaccionListNewTransaccion.equals(cuenta)) {
-                        oldIdCuentaOfTransaccionListNewTransaccion.getTransaccionList().remove(transaccionListNewTransaccion);
-                        oldIdCuentaOfTransaccionListNewTransaccion = em.merge(oldIdCuentaOfTransaccionListNewTransaccion);
-                    }
-                }
-            }
+//            for (Transaccion transaccionListNewTransaccion : transaccionListNew) {
+//                if (!transaccionListOld.contains(transaccionListNewTransaccion)) {
+//                    Cuenta oldIdCuentaOfTransaccionListNewTransaccion = transaccionListNewTransaccion.getIdCuenta();
+//                    transaccionListNewTransaccion.setIdCuenta(cuenta);
+//                    transaccionListNewTransaccion = em.merge(transaccionListNewTransaccion);
+//                    if (oldIdCuentaOfTransaccionListNewTransaccion != null && !oldIdCuentaOfTransaccionListNewTransaccion.equals(cuenta)) {
+//                        oldIdCuentaOfTransaccionListNewTransaccion.getTransaccionList().remove(transaccionListNewTransaccion);
+//                        oldIdCuentaOfTransaccionListNewTransaccion = em.merge(oldIdCuentaOfTransaccionListNewTransaccion);
+//                    }
+//                }
+//            }
             em.getTransaction().commit();
+            System.out.println("\nCuenta actualizada correctamente");
         } catch (Exception ex) {
             String msg = ex.getLocalizedMessage();
             if (msg == null || msg.length() == 0) {
                 Integer id = cuenta.getIdCuenta();
                 if (findCuenta(id) == null) {
-                    throw new NonexistentEntityException("The cuenta with id " + id + " no longer exists.");
+                    System.out.println("\nCuenta con ID " + cuenta.getIdCuenta() + " no existente");
+                    System.out.println("No fue posible realizar esta acción, pot favor, inténtelo de nuevo");
                 }
             }
-            throw ex;
         } finally {
             if (em != null) {
                 em.close();
             }
         }
     }
+    
+    public void Update(Cuenta cuenta){
+        EntityManager em = null;
+        
+        try{
+            em = getEntityManager();
+            em.getTransaction().begin();
+            Cuenta persistentCuenta = em.find(Cuenta.class, cuenta.getIdCuenta());
 
-    public void destroy(Integer id) throws NonexistentEntityException {
+            if (em.contains(persistentCuenta)){
+                em.merge(cuenta);
+                System.out.println("\nCuenta actualizada correctamente!");
+            }
+            em.getTransaction().commit();
+        }catch(Exception e){
+            if (findCuenta(cuenta.getIdCuenta()) == null ){
+                System.out.println("\nCuenta con ID " + cuenta.getIdCuenta() + " no existente");
+                System.out.println("No fue posible realizar esta acción, pot favor, inténtelo de nuevo");
+            }
+        }finally{
+            if (em != null)
+                em.close();
+        }    
+    }
+    
+
+    public void Destroy(Integer id){
         EntityManager em = null;
         try {
             em = getEntityManager();
             em.getTransaction().begin();
-            Cuenta cuenta;
-            try {
-                cuenta = em.getReference(Cuenta.class, id);
-                cuenta.getIdCuenta();
-            } catch (EntityNotFoundException enfe) {
-                throw new NonexistentEntityException("The cuenta with id " + id + " no longer exists.", enfe);
-            }
+            Cuenta cuenta = em.getReference(Cuenta.class, id);
+            cuenta.getIdCuenta();
+            
             Cliente nitCliente = cuenta.getNitCliente();
             if (nitCliente != null) {
                 nitCliente.getCuentaList().remove(cuenta);
@@ -187,6 +210,10 @@ public class CuentaJpaController implements Serializable {
             }
             em.remove(cuenta);
             em.getTransaction().commit();
+            System.out.println("\nCuenta eliminada correctamente");
+        } catch (Exception e) {
+                System.out.println("\nCuenta con ID " + id + " no existente");
+                System.out.println("No fue posible realizar esta acción, pot favor, inténtelo de nuevo");
         } finally {
             if (em != null) {
                 em.close();

@@ -30,7 +30,7 @@ public class TipoTransaccionJpaController implements Serializable {
         return emf.createEntityManager();
     }
 
-    public void create(TipoTransaccion tipoTransaccion) {
+    public void Create(TipoTransaccion tipoTransaccion) {
         if (tipoTransaccion.getDetalleTransaccionList() == null) {
             tipoTransaccion.setDetalleTransaccionList(new ArrayList<DetalleTransaccion>());
         }
@@ -55,6 +55,7 @@ public class TipoTransaccionJpaController implements Serializable {
                 }
             }
             em.getTransaction().commit();
+            System.out.println("\nTipo de transacción agregado corretamente");
         } finally {
             if (em != null) {
                 em.close();
@@ -62,7 +63,7 @@ public class TipoTransaccionJpaController implements Serializable {
         }
     }
 
-    public void edit(TipoTransaccion tipoTransaccion) throws NonexistentEntityException, Exception {
+    public void Edit(TipoTransaccion tipoTransaccion) throws NonexistentEntityException, Exception {
         EntityManager em = null;
         try {
             em = getEntityManager();
@@ -96,11 +97,14 @@ public class TipoTransaccionJpaController implements Serializable {
                 }
             }
             em.getTransaction().commit();
+            System.out.println("\nTipo de transaccion editado correctamente");
         } catch (Exception ex) {
             String msg = ex.getLocalizedMessage();
             if (msg == null || msg.length() == 0) {
                 Integer id = tipoTransaccion.getIdTipoTransaccion();
                 if (findTipoTransaccion(id) == null) {
+                    System.out.println("\nTipo de Transacción con ID " + tipoTransaccion.getIdTipoTransaccion() + " no existente");
+                    System.out.println("No fue posible realizar esta acción, pot favor, inténtelo de nuevo");
                     throw new NonexistentEntityException("The tipoTransaccion with id " + id + " no longer exists.");
                 }
             }
@@ -112,18 +116,39 @@ public class TipoTransaccionJpaController implements Serializable {
         }
     }
 
-    public void destroy(Integer id) throws NonexistentEntityException {
+    public void Update(TipoTransaccion tipoTransaccion){
+        EntityManager em = null;
+        
+        try{
+            em = getEntityManager();
+            em.getTransaction().begin();
+            TipoTransaccion persistentTipoTransaccion = em.find(TipoTransaccion.class, tipoTransaccion.getIdTipoTransaccion());
+
+            if (em.contains(persistentTipoTransaccion)){
+                em.merge(tipoTransaccion);
+                System.out.println("\nTipo de transaccion editada correctamente!");
+            }
+            em.getTransaction().commit();
+        }catch(Exception e){
+            if (findTipoTransaccion(tipoTransaccion.getIdTipoTransaccion()) == null ){
+                System.out.println("\nTipo de transacción con ID " + tipoTransaccion.getIdTipoTransaccion() + " no existente");
+                System.out.println("No fue posible realizar esta acción, pot favor, inténtelo de nuevo");
+            }
+        }finally{
+            if (em != null)
+                em.close();
+        }    
+    }    
+    
+    public void Destroy(Integer id){
         EntityManager em = null;
         try {
             em = getEntityManager();
             em.getTransaction().begin();
-            TipoTransaccion tipoTransaccion;
-            try {
-                tipoTransaccion = em.getReference(TipoTransaccion.class, id);
-                tipoTransaccion.getIdTipoTransaccion();
-            } catch (EntityNotFoundException enfe) {
-                throw new NonexistentEntityException("The tipoTransaccion with id " + id + " no longer exists.", enfe);
-            }
+            
+            TipoTransaccion tipoTransaccion = em.getReference(TipoTransaccion.class, id);
+            tipoTransaccion.getIdTipoTransaccion();
+            
             List<DetalleTransaccion> detalleTransaccionList = tipoTransaccion.getDetalleTransaccionList();
             for (DetalleTransaccion detalleTransaccionListDetalleTransaccion : detalleTransaccionList) {
                 detalleTransaccionListDetalleTransaccion.setIdTipo(null);
@@ -131,6 +156,10 @@ public class TipoTransaccionJpaController implements Serializable {
             }
             em.remove(tipoTransaccion);
             em.getTransaction().commit();
+            System.out.println("\nTipo de trsnsaccion eliminado corrstamente");
+        } catch (Exception e) {
+            System.out.println("\nTipo de transacción con ID " + id + " no existente");
+            System.out.println("No fue posible realizar esta acción, pot favor, inténtelo de nuevo");
         } finally {
             if (em != null) {
                 em.close();
